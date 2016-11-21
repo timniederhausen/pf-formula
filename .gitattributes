@@ -1,0 +1,9 @@
+* text=auto
+
+*.sls text
+*.ini text
+*.conf text
+*.py text
+*.rb text
+
+*.sh text eol=lf
