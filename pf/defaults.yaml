@@ -1,0 +1,7 @@
+pf:
+  file: /etc/pf.conf
+  service: pf
+  service_enabled: false
+  tables: []
+  variables: {}
+  rules: []

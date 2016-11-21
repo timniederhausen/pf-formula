@@ -1,0 +1,9 @@
+{% import_yaml 'pf/defaults.yaml' as defaults %}
+
+{# merge the pillar:lookup dict into the defaults/os specific dict #}
+{% set lookup = salt['pillar.get']('pf:lookup',
+                                   default=defaults.pf,
+                                   merge=True) %}
+
+{# merge the actual pf pillar into the above combined dict #}
+{% set pf = salt['pillar.get']('pf', default=lookup, merge=True) %}

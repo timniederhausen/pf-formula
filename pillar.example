@@ -1,0 +1,49 @@
+pf:
+  tables:
+    abusive_hosts:
+      options: persist
+    admin_hosts:
+      options: const
+  rules:
+    # Options
+    - set block-policy drop
+    - set loginterface igb0
+    - set skip on lo0
+    - set optimization conservative
+    - set limit { states 500000, frags 40000, src-nodes 200000, table-entries 300000 }
+
+    # Normalizes packets and masks the OS's shortcomings such as SYN/FIN packets
+    # [scrub reassemble tcp](BID 10183) and sequence number approximation
+    # bugs (BID 7487).
+    # This is currently disabled because it creates states for rules we don't want states for...
+    #- scrub on $ext_if reassemble tcp no-df random-id
+
+    - antispoof quick for lo0 igb0 igb1
+
+    - block log all
+
+    - block in quick from <abusive_hosts>
+
+    # Allow limited broadcast traffic from my own net.
+    - pass quick from any to 255.255.255.255 no state
+
+    # Allow any link-local multicast traffic
+    - pass quick from fe80::/10 to ff02::/16 no state
+    - pass quick from any to ff02::/16 no state
+
+    # Allow DHCPv6
+    - pass quick proto udp from fe80::/10 to any port 546 no state
+
+    # IPv6 options
+    pass quick proto icmp6 from :: to ff02::/16 no state
+
+    # RS, RA, NS, NA, redirect...
+    - pass quick proto icmp6 from fe80::/10 to fe80::/10 no state
+    - pass quick proto icmp6 from fe80::/10 to ff02::/16 no state
+
+    - pass out quick keep state
+
+    # Necessary to allow traffic out that doesn't have state
+    - pass out quick no state
+
+    - pass in proto { icmp, icmp6 } from any to any no state
