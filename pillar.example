@@ -18,7 +18,8 @@ pf:
     # This is currently disabled because it creates states for rules we don't want states for...
     #- scrub on $ext_if reassemble tcp no-df random-id
 
-    - antispoof quick for lo0 igb0 igb1
+    # not for testing in 11.2
+    # - antispoof quick for lo0 igb0 igb1
 
     - block log all
 
@@ -35,7 +36,8 @@ pf:
     - pass quick proto udp from fe80::/10 to any port 546 no state
 
     # IPv6 options
-    pass quick proto icmp6 from :: to ff02::/16 no state
+    # needs to be reencoded by jinja
+    # - pass quick proto icmp6 from :: to ff02::/16 no state
 
     # RS, RA, NS, NA, redirect...
     - pass quick proto icmp6 from fe80::/10 to fe80::/10 no state

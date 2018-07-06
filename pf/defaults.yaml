@@ -5,3 +5,4 @@ pf:
   tables: []
   variables: {}
   rules: []
+  kmodule: pf

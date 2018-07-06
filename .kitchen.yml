@@ -1,0 +1,42 @@
+<%
+require 'yaml'
+formula = YAML.load_file('metadata.yml')
+formula_name = formula['name']
+%>
+---
+
+driver:
+  name: vagrant
+  hostname: pf.ci.local
+
+provisioner:
+  name: salt_solo
+  salt_bootstrap_url: https://bootstrap.saltstack.com
+  salt_install: bootstrap
+  salt_bootstrap_options: -X git v2017.7.5
+  salt_version: '2017.7.5'
+  pillars-from-files:
+    <%= formula_name %>.sls: pillar.example
+  pillars:
+    top.sls:
+      base:
+        '*':
+          - <%= formula_name %>
+  log_level: <%= ENV['SALT_DEBUG_LEVEL'] || 'debug' %>
+  formula: <%= formula_name %>
+  state_top:
+    base:
+      '*':
+        - <%= formula_name %>
+
+platforms:
+  - name: freebsd-10
+    driver:
+      cache_directory: false
+
+  - name: freebsd-11
+    driver:
+      cache_directory: false
+
+suites:
+  - name: default
