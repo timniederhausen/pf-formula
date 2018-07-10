@@ -1,10 +1,11 @@
 {% from 'pf/map.jinja' import pf with context %}
 
 pf_load_{{ pf.kmodule }}:
-  module.run:
-    - name: kmod.load
-    - mod: {{ pf.kmodule }}
-    - persist: True
+  kmod.present:
+    - name: {{ pf.kmodule }}
+    - persist: true
+    - require_in:
+      - pf_config
 
 pf_config:
   file.managed:
