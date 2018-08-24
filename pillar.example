@@ -4,14 +4,17 @@ pf:
       options: persist
     admin_hosts:
       options: const
-  rules:
-    # Options
+  options
     - set block-policy drop
     - set loginterface igb0
     - set skip on lo0
     - set optimization conservative
     - set limit { states 500000, frags 40000, src-nodes 200000, table-entries 300000 }
 
+  translate:
+   - nat on $public_interface from lo1:network to !$jail_network -> ($public_interface)
+
+  rules:
     # Normalizes packets and masks the OS's shortcomings such as SYN/FIN packets
     # [scrub reassemble tcp](BID 10183) and sequence number approximation
     # bugs (BID 7487).
