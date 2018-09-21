@@ -1,4 +1,11 @@
 pf:
+  service_enabled: True
+  pfsync:
+    enabled: True
+    syncdev: em1
+    syncpeer: 192.168.254.254
+  pflog:
+    enabled: True
   tables:
     abusive_hosts:
       options: persist
