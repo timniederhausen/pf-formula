@@ -67,8 +67,13 @@ pf:
     # This is currently disabled because it creates states for rules we don't want states for...
     - scrub on $public_interface reassemble tcp no-df random-id
 
+  queueing:
+    - altq on $public_interface priq bandwidth 800Kb queue { q_pri, q_def }
+    - queue q_pri priority 7
+    - queue q_def priority 1 priq(default)
+
   translation:
-   - nat on $public_interface from em0 to !$jail_network -> ($public_interface)
+    - nat on $public_interface from em0 to !$jail_network -> ($public_interface)
 
   filtering:
     - block log all
