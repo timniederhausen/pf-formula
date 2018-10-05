@@ -3,6 +3,8 @@ pf:
   service: pf
   service_enabled: false
   tables: []
+  macros: {}
   variables: {}
+  nat: []
   rules: []
   kmodule: pf

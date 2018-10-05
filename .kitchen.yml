@@ -8,6 +8,10 @@ formula_name = formula['name']
 driver:
   name: vagrant
   hostname: pf.ci.local
+  linked_clone: true
+  customize:
+    nictype1: virtio
+    nictype2: virtio
 
 provisioner:
   name: salt_solo
@@ -28,6 +32,9 @@ provisioner:
     base:
       '*':
         - <%= formula_name %>
+
+verifier:
+  name: busser
 
 platforms:
   - name: freebsd-10

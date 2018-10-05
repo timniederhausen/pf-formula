@@ -1,18 +1,24 @@
+# PF files have to be ordered
 pf:
   tables:
     abusive_hosts:
       options: persist
     admin_hosts:
       options: const
-  options
+
+  macros:
+    jail_network: 192.168.1.0/24
+    public_interface: em0
+
+  options:
     - set block-policy drop
     - set loginterface igb0
     - set skip on lo0
     - set optimization conservative
     - set limit { states 500000, frags 40000, src-nodes 200000, table-entries 300000 }
 
-  translate:
-   - nat on $public_interface from lo1:network to !$jail_network -> ($public_interface)
+  nat:
+   - nat on $public_interface from em0 to !$jail_network -> ($public_interface)
 
   rules:
     # Normalizes packets and masks the OS's shortcomings such as SYN/FIN packets
