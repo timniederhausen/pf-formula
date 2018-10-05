@@ -2,9 +2,10 @@ pf:
   file: /etc/pf.conf
   service: pf
   service_enabled: false
-  tables: []
   macros: {}
-  variables: {}
-  nat: []
-  rules: []
+  tables: []
+  options: {}
+  normalization: []
+  translation: []
+  filtering: []
   kmodule: pf

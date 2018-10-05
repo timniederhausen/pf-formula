@@ -7,18 +7,22 @@ formula_name = formula['name']
 
 driver:
   name: vagrant
+  cache_directory: false
   hostname: pf.ci.local
-  linked_clone: true
   customize:
     nictype1: virtio
     nictype2: virtio
+  linked_clone: true
+  provision: true
 
 provisioner:
   name: salt_solo
+  # This is needed for FreeBSD until https://github.com/saltstack/kitchen-salt/pull/255 is merged
+  #bootstrap_url: https://raw.githubusercontent.com/Perceptyx/kitchen-salt/freebsd_assets_fix/assets/install.sh
   salt_bootstrap_url: https://bootstrap.saltstack.com
   salt_install: bootstrap
-  salt_bootstrap_options: -X git v2017.7.5
-  salt_version: '2017.7.5'
+  salt_bootstrap_options: -p git -p curl -p ca_root_nss -p py27-pip -p python
+  salt_version: latest
   pillars-from-files:
     <%= formula_name %>.sls: pillar.example
   pillars:
@@ -37,13 +41,17 @@ verifier:
   name: busser
 
 platforms:
-  - name: freebsd-10
+  - name: freebsd-10.4
     driver:
       cache_directory: false
+      network:
+        - ["private_network", {":adapter => 2", virtualbox__intnet: "PFSYNC"}]
 
-  - name: freebsd-11
+  - name: freebsd-11.2
     driver:
       cache_directory: false
+      network:
+        - ["private_network", {":adapter => 2", virtualbox__intnet: "PFSYNC"}]
 
 suites:
   - name: default
