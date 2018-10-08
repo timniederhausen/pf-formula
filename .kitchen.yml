@@ -17,8 +17,6 @@ driver:
 
 provisioner:
   name: salt_solo
-  # This is needed for FreeBSD until https://github.com/saltstack/kitchen-salt/pull/255 is merged
-  #bootstrap_url: https://raw.githubusercontent.com/Perceptyx/kitchen-salt/freebsd_assets_fix/assets/install.sh
   salt_bootstrap_url: https://bootstrap.saltstack.com
   salt_install: bootstrap
   salt_bootstrap_options: -p git -p curl -p ca_root_nss -p py27-pip -p python
