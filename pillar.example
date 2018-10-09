@@ -1,3 +1,38 @@
+# STATEMENT ORDER
+# There are seven types of statements in pf.conf:
+#
+# Macros
+#	  User-defined	variables may be defined and used later, simplifying
+#	  the configuration file.  Macros must	be defined before they are
+#	  referenced in pf.conf.
+#
+# Tables
+#	  Tables provide a mechanism for increasing the performance and flex-
+#	  ibility of rules with large numbers of source or destination
+#	  addresses.
+#
+# Options
+#	  Options tune	the behaviour of the packet filtering engine.
+#
+# Traffic Normalization (e.g. scrub)
+#	  Traffic normalization protects internal machines against inconsis-
+#	  tencies in Internet protocols and implementations.
+#
+# Queueing
+#	  Queueing provides rule-based	bandwidth control.
+#
+# Translation (Various forms	of NAT)
+#	  Translation rules specify how addresses are to be mapped or redi-
+#	  rected to other addresses.
+#
+# Packet Filtering
+#	  Packet filtering provides rule-based	blocking or passing of pack-
+#	  ets.
+#
+# With the exception of macros and tables, the types of statements should
+# be grouped	and appear in pf.conf in the order shown above,	as this
+# matches the operation of the underlying packet filtering engine.  By
+# default pfctl(8) enforces this order (see set require-order below).
 pf:
   service_enabled: True
   pfsync:
@@ -6,28 +41,41 @@ pf:
     syncpeer: 192.168.254.254
   pflog:
     enabled: True
+
+  macros:
+    jail_network: 192.168.1.0/24
+    public_interface: em0
+    private_interface: em1
+
   tables:
     abusive_hosts:
       options: persist
     admin_hosts:
       options: const
-  rules:
-    # Options
+
+  options:
     - set block-policy drop
-    - set loginterface igb0
+    - set loginterface em0
     - set skip on lo0
     - set optimization conservative
     - set limit { states 500000, frags 40000, src-nodes 200000, table-entries 300000 }
 
+  normalization:
     # Normalizes packets and masks the OS's shortcomings such as SYN/FIN packets
     # [scrub reassemble tcp](BID 10183) and sequence number approximation
     # bugs (BID 7487).
     # This is currently disabled because it creates states for rules we don't want states for...
-    #- scrub on $ext_if reassemble tcp no-df random-id
+    - scrub on $public_interface reassemble tcp no-df random-id
 
-    # not for testing in 11.2
-    # - antispoof quick for lo0 igb0 igb1
+  queueing:
+    - altq on $public_interface priq bandwidth 800Kb queue { q_pri, q_def }
+    - queue q_pri priority 7
+    - queue q_def priority 1 priq(default)
 
+  translation:
+    - nat on $public_interface from em0 to !$jail_network -> ($public_interface)
+
+  filtering:
     - block log all
 
     - block in quick from <abusive_hosts>

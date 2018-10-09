@@ -2,7 +2,11 @@ pf:
   file: /etc/pf.conf
   service: pf
   service_enabled: false
+  macros: {}
   tables: []
-  variables: {}
-  rules: []
+  options: {}
+  normalization: []
+  queueing: []
+  translation: []
+  filtering: []
   kmodule: pf

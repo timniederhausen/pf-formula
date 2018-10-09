@@ -12,8 +12,6 @@ driver:
   customize:
     nictype1: virtio
     nictype2: virtio
-
-driver_config:
   linked_clone: true
   provision: true
 
@@ -36,6 +34,9 @@ provisioner:
     base:
       '*':
         - <%= formula_name %>
+
+verifier:
+  name: busser
 
 platforms:
   - name: freebsd-10.4
