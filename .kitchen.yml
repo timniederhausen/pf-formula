@@ -1,0 +1,55 @@
+<%
+require 'yaml'
+formula = YAML.load_file('metadata.yml')
+formula_name = formula['name']
+%>
+---
+
+driver:
+  name: vagrant
+  cache_directory: false
+  hostname: pf.ci.local
+  customize:
+    nictype1: virtio
+    nictype2: virtio
+  linked_clone: true
+  provision: true
+
+provisioner:
+  name: salt_solo
+  salt_bootstrap_url: https://bootstrap.saltstack.com
+  salt_install: bootstrap
+  salt_bootstrap_options: -p git -p curl -p ca_root_nss -p py27-pip -p python
+  salt_version: latest
+  pillars-from-files:
+    <%= formula_name %>.sls: pillar.example
+  pillars:
+    top.sls:
+      base:
+        '*':
+          - <%= formula_name %>
+  log_level: <%= ENV['SALT_DEBUG_LEVEL'] || 'debug' %>
+  formula: <%= formula_name %>
+  state_top:
+    base:
+      '*':
+        - <%= formula_name %>
+
+verifier:
+  name: busser
+
+platforms:
+  - name: freebsd-10.4
+    driver:
+      cache_directory: false
+      network:
+        - ["private_network", {":adapter => 2", virtualbox__intnet: "PFSYNC"}]
+
+  - name: freebsd-11.2
+    driver:
+      cache_directory: false
+      network:
+        - ["private_network", {":adapter => 2", virtualbox__intnet: "PFSYNC"}]
+
+suites:
+  - name: default
