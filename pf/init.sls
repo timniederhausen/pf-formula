@@ -24,6 +24,15 @@ pf_config:
 {% set service_function = 'running' if pf.service_enabled else 'dead' %}
 
 pf_service:
+  {% if service_function == 'running' %}
+  cmd.run:
+    - name: service pf onestart
+    - onlyif: "service pf onestatus | grep -oqE '^Status: Disabled' && pfctl -nf {{ pf.file }}"
+    - require:
+      - file: pf_config
+    - require_in:
+      - service: pf
+  {% endif %}
   service.{{ service_function }}:
     - name: {{ pf.service }}
     - reload: True
