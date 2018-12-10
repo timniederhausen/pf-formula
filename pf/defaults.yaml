@@ -2,6 +2,10 @@ pf:
   file: /etc/pf.conf
   service: pf
   service_enabled: false
+  pflog:
+    enabled: false
+  pfsync:
+    enabled: false
   macros: {}
   tables: []
   options: {}

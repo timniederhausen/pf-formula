@@ -67,10 +67,14 @@ pf:
     # This is currently disabled because it creates states for rules we don't want states for...
     - scrub on $public_interface reassemble tcp no-df random-id
 
-  queueing:
-    - altq on $public_interface priq bandwidth 800Kb queue { q_pri, q_def }
-    - queue q_pri priority 7
-    - queue q_def priority 1 priq(default)
+  # If you want to use ALTQ you need to compile kernel with such options because it's not enabled in
+  # GENERIC kernel image.
+  # https://www.freebsd.org/cgi/man.cgi?query=altq&sektion=4&manpath=freebsd-release-ports#end
+  # https://github.com/freebsd/freebsd/blob/master/sys/amd64/conf/GENERIC
+  #queueing:
+  #  - altq on $public_interface priq bandwidth 800Kb queue { q_pri, q_def }
+  #  - queue q_pri priority 7
+  #  - queue q_def priority 1 priq(default)
 
   translation:
     - nat on $public_interface from em0 to !$jail_network -> ($public_interface)
@@ -104,3 +108,6 @@ pf:
     - pass out quick no state
 
     - pass in proto { icmp, icmp6 } from any to any no state
+
+    # Needed for Kitchen CI SSH
+    - pass in quick proto tcp from any to port ssh flags S/SA keep state
